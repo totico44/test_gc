@@ -28,28 +28,31 @@ class ExerciseThreeService
         end
         
         #Aqui realizamos la lógica del problema
-        covered_points = []
-        anthenas_to_points = []
+        covered_ranges = []
+        anthenas_to_ranges = []
       
-        #Convertimos los datos de cada entena (radio y localizacón) en un array con los puntos de covertura de cada una
+        #Convertimos los datos de cada entena (radio y localizacón) en un array con los RANGOS de covertura de cada una
         anthenas.each do |anthena, index|
-          anthena_to_points = [anthena[:location]]
+          anthena_to_ranges = []
           anthena[:ratio].times do |x|
-            anthena_to_points.insert(0,anthena[:location] - (x+1)) if (anthena[:location] - (x+1)) >= 0
-            anthena_to_points << (anthena[:location] + (x+1)) if (anthena[:location] + (x+1)) <= street_longitude
+            anthena_to_ranges.insert(0,[anthena[:location] - (x+1), anthena[:location] - (x)] ) if (anthena[:location] - (x+1)) >= 0
+            anthena_to_ranges << ([anthena[:location] + x, anthena[:location] + (x+1)] ) if (anthena[:location] + (x+1)) <= street_longitude
           end
-          anthenas_to_points << anthena_to_points
+          anthenas_to_ranges << anthena_to_ranges
         end 
+        # puts "#{anthenas_to_ranges}"
         
         #Empezamos a revisar los puntos de covertura de todas las antenas
         anthenas.each_with_index do |anthena, index|
-          if anthena[:ratio] == 0
+          if anthena[:ratio] == 0 || anthena[:location] > street_longitude
             removing_anthenas_quantity += 1
             anthena[:removed] = true
+            # puts "1. Antenas removida en la posicion #{anthena[:location]}, en el index #{index} "
           else
-            if (covered_points & anthenas_to_points[index]).length == anthenas_to_points[index].length
+            if (covered_ranges & anthenas_to_ranges[index]).length == anthenas_to_ranges[index].length
               removing_anthenas_quantity += 1
               anthena[:removed] = true
+               # puts "2. Antenas removida en la posicion #{anthena[:location]}, en el index #{index} "
             else
               if index >=2
                 (index+1).times do |x|
@@ -58,26 +61,27 @@ class ExerciseThreeService
                     set2 = []
                     (index+1).times do |y| 
                       if anthenas[y][:removed] == false
-                        set1 = set1 | anthenas_to_points[y]  
-                        set2 = set2 | anthenas_to_points[y] unless (x==y) 
+                        set1 = set1 | anthenas_to_ranges[y]  
+                        set2 = set2 | anthenas_to_ranges[y] unless (x==y) 
                       end
                     end
                     set1 = set1.sort
                     set2 = set2.sort
-                    if set1 == set2 &&
+                    if set1 == set2
                       removing_anthenas_quantity += 1
                       anthenas[x][:removed] = true
+                       # puts "3. Antenas removida en la posicion #{anthenas[x][:location]}, en el index #{x} "
                     end
                   end
                 end
               end
             end
           end
-          covered_points = covered_points | anthenas_to_points[index]
+          covered_ranges = covered_ranges | anthenas_to_ranges[index]
         end
         
         #Impimimos el resultado
-        if covered_points.length == street_longitude+ 1
+        if covered_ranges.length >= street_longitude+ 1
           result << removing_anthenas_quantity
         else
           result << -1
