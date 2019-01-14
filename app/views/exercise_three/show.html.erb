@@ -1,0 +1,25 @@
+<h3>Carga Archivo para Resolver el ejercicio No. 3</h3>
+
+<%= form_with url: exercise_three_path, local: true do |f| %>
+  <div class="row">
+    <div class="col-4">
+      <div class="form-group">
+        <%= f.label :input_file, 'Elige el archivo con el input de prueba' %>
+        <%= f.file_field :input_file, class: 'form-control' %>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group mt-20">
+    <%= f.submit 'Cargar', class: 'btn btn-primary btn-lg' %>
+  </div>
+<% end %>
+
+<hr>
+<h5>Solución</h5>
+  <% @solution.each do |sol| %>
+	<p><%= sol%></p>
+  <% end%>
+
+
+
