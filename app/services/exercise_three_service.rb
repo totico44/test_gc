@@ -80,8 +80,10 @@ class ExerciseThreeService
           covered_ranges = covered_ranges | anthenas_to_ranges[index]
         end
         
+        puts "#{covered_ranges}"
+        
         #Impimimos el resultado
-        if covered_ranges.length >= street_longitude+ 1
+        if covered_ranges.length >= street_longitude
           result << removing_anthenas_quantity
         else
           result << -1
